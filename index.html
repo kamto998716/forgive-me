@@ -12,19 +12,24 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
             text-align: center;
+            padding: 10px;
+            box-sizing: border-box;
         }
         
         .container {
             max-width: 800px;
             padding: 20px;
+            width: 100%;
         }
         
         .character-img {
-            width: 400px; /* 2X larger */
+            width: 100%;
+            max-width: 400px; /* 2X larger */
             margin-bottom: 20px;
+            height: auto;
         }
         
         .slogan {
@@ -37,6 +42,7 @@
             justify-content: center;
             align-items: center;
             gap: 20px;
+            flex-wrap: wrap; /* Allow buttons to wrap on small screens */
         }
         
         #forgiveBtn {
@@ -73,6 +79,9 @@
         
         .love-page {
             display: none;
+            width: 100%;
+            max-width: 800px;
+            padding: 20px;
         }
         
         .love-text {
@@ -81,7 +90,54 @@
         }
         
         .love-img {
-            width: 350px; /* 2.5X larger */
+            width: 100%;
+            max-width: 350px; /* 2.5X larger */
+            height: auto;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .slogan {
+                font-size: 20px;
+            }
+            
+            .love-text {
+                font-size: 24px;
+            }
+            
+            #forgiveBtn, #angryBtn {
+                padding: 10px 20px;
+                font-size: 16px;
+                height: 45px;
+            }
+            
+            #angryBtn {
+                width: 130px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .slogan {
+                font-size: 18px;
+            }
+            
+            .love-text {
+                font-size: 20px;
+            }
+            
+            .buttons {
+                gap: 10px;
+            }
+            
+            #forgiveBtn, #angryBtn {
+                padding: 8px 16px;
+                font-size: 14px;
+                height: 40px;
+            }
+            
+            #angryBtn {
+                width: 120px;
+            }
         }
     </style>
 </head>
@@ -174,15 +230,20 @@
         let btnSizeIncrease = 0;
         let clickCount = 0;
         const maxClicks = 35; // Button B will disappear after 35 clicks
+        let musicStarted = false;
         
         // Try to play music automatically when page loads
         window.addEventListener('load', function() {
             // Try to play background music
-            bgMusic.play().catch(e => {
+            bgMusic.play().then(() => {
+                musicStarted = true;
+            }).catch(e => {
                 console.log("Autoplay prevented. User interaction needed.");
                 // Add one-time click listener to the whole document
                 document.addEventListener('click', function playMusic() {
-                    bgMusic.play().catch(e => console.log("Still couldn't play music"));
+                    bgMusic.play().then(() => {
+                        musicStarted = true;
+                    }).catch(e => console.log("Still couldn't play music"));
                     document.removeEventListener('click', playMusic);
                 }, { once: true });
             });
@@ -193,50 +254,64 @@
             forgiveContainer.style.display = 'none';
             lovePage.style.display = 'block';
             
-            // Switch music
-            bgMusic.pause();
-            loveMusic.play().catch(e => {
-                console.log("Couldn't play love music automatically");
-                // Try again with user interaction
-                document.addEventListener('click', function playLoveMusic() {
-                    loveMusic.play();
-                    document.removeEventListener('click', playLoveMusic);
-                }, { once: true });
-            });
+            // Switch music - first ensure sad music is stopped
+            if (musicStarted) {
+                bgMusic.pause();
+                bgMusic.currentTime = 0; // Reset to beginning
+            }
+            
+            // Add a delay before playing happy music
+            setTimeout(() => {
+                loveMusic.play().catch(e => {
+                    console.log("Couldn't play love music automatically");
+                    // Try again with user interaction
+                    document.addEventListener('click', function playLoveMusic() {
+                        loveMusic.play();
+                        document.removeEventListener('click', playLoveMusic);
+                    }, { once: true });
+                });
+            }, 500); // 500ms delay
         });
         
         // When angry button is clicked
         angryBtn.addEventListener('click', function() {
             clickCount++;
             
+            // Ensure music is playing after user interaction
+            if (!musicStarted) {
+                bgMusic.play().then(() => {
+                    musicStarted = true;
+                }).catch(e => console.log("Still couldn't play music"));
+            }
+            
+            // Calculate responsive size increases based on screen width
+            const isMobile = window.innerWidth <= 480;
+            const isTablet = window.innerWidth <= 768 && window.innerWidth > 480;
+            const sizeIncreaseFactor = isMobile ? 5 : (isTablet ? 7 : 10);
+            
             // Increase size of forgive button
-            btnSizeIncrease += 10;
-            forgiveBtn.style.padding = `${15 + btnSizeIncrease}px ${30 + btnSizeIncrease}px`;
-            forgiveBtn.style.fontSize = `${18 + btnSizeIncrease/2}px`;
+            btnSizeIncrease += sizeIncreaseFactor;
+            const basePadding = isMobile ? 8 : (isTablet ? 10 : 15);
+            const baseFontSize = isMobile ? 14 : (isTablet ? 16 : 18);
+            
+            forgiveBtn.style.padding = `${basePadding + btnSizeIncrease/2}px ${basePadding*2 + btnSizeIncrease}px`;
+            forgiveBtn.style.fontSize = `${baseFontSize + btnSizeIncrease/3}px`;
             
             // Decrease height, width, and font size of angry button
             const currentHeight = parseInt(window.getComputedStyle(angryBtn).height);
             const currentWidth = parseInt(window.getComputedStyle(angryBtn).width);
-            const newHeight = Math.max(20, currentHeight - 5); // Don't let it get smaller than 20px
-            const newWidth = Math.max(50, currentWidth - 5); // Don't let it get narrower than 50px
+            const minHeight = isMobile ? 15 : 20;
+            const minWidth = isMobile ? 40 : 50;
+            const decreaseFactor = isMobile ? 3 : 5;
+            
+            const newHeight = Math.max(minHeight, currentHeight - decreaseFactor);
+            const newWidth = Math.max(minWidth, currentWidth - decreaseFactor);
             
             angryBtn.style.height = newHeight + 'px';
             angryBtn.style.width = newWidth + 'px';
-            angryBtn.style.fontSize = Math.max(8, 16 - clickCount/2) + 'px'; // Decrease font size, min 8px
+            
+            const baseBtnFontSize = isMobile ? 14 : (isTablet ? 16 : 16);
+            angryBtn.style.fontSize = Math.max(6, baseBtnFontSize - clickCount/2) + 'px'; // Decrease font size
             
             // Change to next image
-            currentImageIndex = (currentImageIndex + 1) % imagePaths.length;
-            characterImg.src = imagePaths[currentImageIndex];
-            
-            // Change to next slogan
-            currentSloganIndex = (currentSloganIndex + 1) % slogans.length;
-            sloganElement.textContent = slogans[currentSloganIndex];
-            
-            // Hide angry button after max clicks
-            if (clickCount >= maxClicks) {
-                angryBtn.style.display = 'none';
-            }
-        });
-    </script>
-</body>
-</html>
+            currentImageIndex = (currentImageIndex + 1) % imagePaths
