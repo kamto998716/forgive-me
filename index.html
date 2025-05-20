@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>請原諒我🥺❤️</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #ffd1dc; /* Pinky background */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            text-align: center;
+        }
+        
+        .container {
+            max-width: 800px;
+            padding: 20px;
+        }
+        
+        .character-img {
+            width: 400px; /* 2X larger */
+            margin-bottom: 20px;
+        }
+        
+        .slogan {
+            font-size: 24px;
+            margin-bottom: 30px;
+        }
+        
+        .buttons {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        #forgiveBtn {
+            background-color: #e57373;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.3s;
+            height: 50px; /* Set initial height same as angry button */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        #angryBtn {
+            background-color: #1565c0;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            height: 50px; /* Initial height same as forgive button */
+            width: 150px; /* Initial width */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        
+        .love-page {
+            display: none;
+        }
+        
+        .love-text {
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+        
+        .love-img {
+            width: 350px; /* 2.5X larger */
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="forgive-container">
+        <img src="cartoon1.jpg" alt="Cute cartoon character" class="character-img" id="characterImg">
+        <div class="slogan" id="slogan">親愛嘅，對唔住呀，係我唔夠細心，冇諗清楚你嘅感受🥺</div>
+        <div class="buttons">
+            <button id="forgiveBtn">原諒</button>
+            <button id="angryBtn">我還是不開心</button>
+        </div>
+    </div>
+    
+    <div class="love-page" id="love-page">
+        <div class="love-text">!!!我愛你!! (>_<)♡</div>
+        <img src="love.jpg" alt="Love cartoon" class="love-img">
+    </div>
+
+    <audio id="bgMusic" loop>
+        <source src="sad.mp3" type="audio/mpeg">
+    </audio>
+    
+    <audio id="loveMusic">
+        <source src="happy.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        // Elements
+        const forgiveContainer = document.getElementById('forgive-container');
+        const lovePage = document.getElementById('love-page');
+        const forgiveBtn = document.getElementById('forgiveBtn');
+        const angryBtn = document.getElementById('angryBtn');
+        const characterImg = document.getElementById('characterImg');
+        const sloganElement = document.getElementById('slogan');
+        const bgMusic = document.getElementById('bgMusic');
+        const loveMusic = document.getElementById('loveMusic');
+        
+        // Image paths - replace with your actual image paths
+        const imagePaths = [
+            'cartoon1.jpg', 'cartoon2.jpg', 'cartoon3.jpg', 'cartoon4.jpg', 'cartoon5.jpg',
+            'cartoon6.jpg', 'cartoon7.jpg', 'cartoon8.jpg', 'cartoon9.jpg', 'cartoon10.jpg',
+            'cartoon11.jpg', 'cartoon12.jpg', 'cartoon13.jpg', 'cartoon14.jpg', 'cartoon15.jpg',
+            'cartoon16.jpg', 'cartoon17.jpg', 'cartoon18.jpg', 'cartoon19.jpg', 'cartoon20.jpg',
+            'cartoon21.jpg', 'cartoon22.jpg', 'cartoon23.jpg', 'cartoon24.jpg', 'cartoon25.jpg',
+            'cartoon26.jpg', 'cartoon27.jpg', 'cartoon28.jpg', 'cartoon29.jpg', 'cartoon30.jpg',
+            'cartoon31.jpg', 'cartoon32.jpg', 'cartoon33.jpg', 'cartoon34.jpg', 'cartoon35.jpg'
+        ];
+        
+        // Array of slogans (30 different messages) in Cantonese
+        const slogans = [
+            "對唔住呀，係我唔夠細心，冇諗清楚你嘅感受 🥺",
+            "我知錯晒啦，頭先啲說話唔應該衝口而出 😔",
+            "可唔可以俾個機會我補償返你呀？🙏",
+            "我知你受咗委屈，真係好對唔住，我會改 😢",
+            "一諗到你唔開心，我個心都好唔舒服 💔",
+            "唔好再嬲啦，好冇？我真係好掛住你 😞💖",
+            "我保證下次一定聽晒你講先再回應，唔再亂咁講嘢 🥺",
+            "你對我真係好重要，我唔想因為一時衝動而失去你 😭❤️",
+            "係我唔啱，我反省咗了，好對唔住 🙇‍♂️",
+            "可唔可以俾我攬一攬你，等我親口同你講聲對唔住？🥺",
+            "係我嘅錯，求你比次機會我 🥺🙏",
+            "我承諾會努力做個更體貼、更細心嘅男朋友 🥺🥺",
+            "我真係好想同你和好 🥺❤️",
+            "今次係我一時衝動，以後一定唔會再犯 🥺😔",
+            "我真係好愛你，唔想我哋之間有任何隔膜 💕🥺",
+            "你唔鍾意嘅習慣，我一定會改，唔會再令你唔舒服 🙏😌",
+            "對唔住，我冇顧及到你嘅感受 😢",
+            "我真係唔想再同你嘈，只係想快啲同你好返 🥺❤️",
+            "你係我最珍惜嘅人，真係唔想失去你 😭💖",
+            "冇咗你，我覺得做乜都冇晒意思了 😔",
+            "冇你喺身邊，我晚晚都諗到瞓唔著 😢🌙",
+            "俾多一次機會我，等我好好彌補返今次嘅錯，好唔好？🙏🥺",
+            "以後我一定會多啲站喺你嘅角度去諗嘢 🥺",
+            "我真係反省過，答應你唔會再重犯 🙏😔",
+            "你嘅笑容對我嚟講係最緊要嘅，我只想見返你開心 😊💕",
+            "以後等我好好寵你、錫你，好唔好？🥺❤️",
+            "無論發生咩事，我都想同你一齊面對，一齊解決 🤝💖",
+            "請你相信我，我哋一定可以愈嚟愈好 🌈✨",
+            "對唔住，我真係好鍾意你，俾多次機會我，好唔好？🥺💘",
+            "見你唔開心我會好心痛 💔😢",
+            "無論點樣，我都會一直喺你身邊陪住你 🥺❤️",
+            "我哋一齊經歷咗咁多，唔想因為呢次而影響我哋嘅感情 🥺💞",
+            "我知自己唔完美，但我一定會盡力為你改變 🥺🙏",
+            "俾機會我再令你開心返~~ 💖",
+        ];
+
+        
+        let currentImageIndex = 0;
+        let currentSloganIndex = 0;
+        let btnSizeIncrease = 0;
+        let clickCount = 0;
+        const maxClicks = 35; // Button B will disappear after 35 clicks
+        
+        // Try to play music automatically when page loads
+        window.addEventListener('load', function() {
+            // Try to play background music
+            bgMusic.play().catch(e => {
+                console.log("Autoplay prevented. User interaction needed.");
+                // Add one-time click listener to the whole document
+                document.addEventListener('click', function playMusic() {
+                    bgMusic.play().catch(e => console.log("Still couldn't play music"));
+                    document.removeEventListener('click', playMusic);
+                }, { once: true });
+            });
+        });
+        
+        // When forgive button is clicked
+        forgiveBtn.addEventListener('click', function() {
+            forgiveContainer.style.display = 'none';
+            lovePage.style.display = 'block';
+            
+            // Switch music
+            bgMusic.pause();
+            loveMusic.play().catch(e => {
+                console.log("Couldn't play love music automatically");
+                // Try again with user interaction
+                document.addEventListener('click', function playLoveMusic() {
+                    loveMusic.play();
+                    document.removeEventListener('click', playLoveMusic);
+                }, { once: true });
+            });
+        });
+        
+        // When angry button is clicked
+        angryBtn.addEventListener('click', function() {
+            clickCount++;
+            
+            // Increase size of forgive button
+            btnSizeIncrease += 10;
+            forgiveBtn.style.padding = `${15 + btnSizeIncrease}px ${30 + btnSizeIncrease}px`;
+            forgiveBtn.style.fontSize = `${18 + btnSizeIncrease/2}px`;
+            
+            // Decrease height, width, and font size of angry button
+            const currentHeight = parseInt(window.getComputedStyle(angryBtn).height);
+            const currentWidth = parseInt(window.getComputedStyle(angryBtn).width);
+            const newHeight = Math.max(20, currentHeight - 5); // Don't let it get smaller than 20px
+            const newWidth = Math.max(50, currentWidth - 5); // Don't let it get narrower than 50px
+            
+            angryBtn.style.height = newHeight + 'px';
+            angryBtn.style.width = newWidth + 'px';
+            angryBtn.style.fontSize = Math.max(8, 16 - clickCount/2) + 'px'; // Decrease font size, min 8px
+            
+            // Change to next image
+            currentImageIndex = (currentImageIndex + 1) % imagePaths.length;
+            characterImg.src = imagePaths[currentImageIndex];
+            
+            // Change to next slogan
+            currentSloganIndex = (currentSloganIndex + 1) % slogans.length;
+            sloganElement.textContent = slogans[currentSloganIndex];
+            
+            // Hide angry button after max clicks
+            if (clickCount >= maxClicks) {
+                angryBtn.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
