@@ -219,16 +219,25 @@
         let clickCount = 0;
         const maxClicks = 35; // Button B will disappear after 35 clicks
         
+        // Flag to track if music has been started
+        let musicStarted = false;
+        
+        // Function to handle first-time music play
+        function startBackgroundMusic() {
+            if (!musicStarted) {
+                bgMusic.play().catch(e => console.log("Still couldn't play music"));
+                musicStarted = true;
+            }
+        }
+        
         // Try to play music automatically when page loads
         window.addEventListener('load', function() {
             // Try to play background music
-            bgMusic.play().catch(e => {
+            bgMusic.play().then(() => {
+                musicStarted = true;
+            }).catch(e => {
                 console.log("Autoplay prevented. User interaction needed.");
-                // Add one-time click listener to the whole document
-                document.addEventListener('click', function playMusic() {
-                    bgMusic.play().catch(e => console.log("Still couldn't play music"));
-                    document.removeEventListener('click', playMusic);
-                }, { once: true });
+                // We'll handle this in the button clicks instead of adding a document listener
             });
         });
         
@@ -237,8 +246,10 @@
             forgiveContainer.style.display = 'none';
             lovePage.style.display = 'block';
             
-            // Switch music
+            // Always pause background music regardless of whether it's playing
             bgMusic.pause();
+            
+            // Play love music
             loveMusic.play().catch(e => {
                 console.log("Couldn't play love music automatically");
                 // Try again with user interaction
@@ -247,10 +258,16 @@
                     document.removeEventListener('click', playLoveMusic);
                 }, { once: true });
             });
+            
+            // Mark music as started
+            musicStarted = true;
         });
         
         // When angry button is clicked
         angryBtn.addEventListener('click', function() {
+            // Start background music if it hasn't started yet
+            startBackgroundMusic();
+            
             clickCount++;
             
             // Increase size of forgive button
